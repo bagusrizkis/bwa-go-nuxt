@@ -4,11 +4,16 @@ Melakukan mapping dari struct input ke struct User
 
 package user
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"errors"
+
+	"golang.org/x/crypto/bcrypt"
+)
 
 // menyimpan method / busines logic User
 type Service interface {
 	RegisterUser(input RegisterUserInput) (User, error)
+	LoginUser(input LoginUserInput) (User, error)
 }
 
 // ketergantungan / referensi ke repository
@@ -42,4 +47,23 @@ func (s *service) RegisterUser(input RegisterUserInput) (User, error) {
 	}
 
 	return newUser, nil
+}
+
+func (s *service) LoginUser(input LoginUserInput) (User, error) {
+	userLogin, err := s.repository.FindByEmail(input.Email)
+	if err != nil {
+		return userLogin, err
+	}
+
+	if userLogin.ID == 0 {
+		return userLogin, errors.New("no user found on that email")
+	}
+
+	// check pw
+	err = bcrypt.CompareHashAndPassword([]byte(userLogin.PasswordHash), []byte(input.Password))
+	if err != nil {
+		return userLogin, err
+	}
+
+	return userLogin, nil
 }

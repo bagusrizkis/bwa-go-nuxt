@@ -21,7 +21,6 @@ func main() {
 	userRepository := user.NewRepository(db)
 	// yang dibalikin adalah User
 	userService := user.NewService(userRepository)
-
 	userHandler := handler.NewUserHandler(userService)
 
 	router := gin.Default()
@@ -29,6 +28,7 @@ func main() {
 	api := router.Group("/api/v1")
 
 	api.POST("/users", userHandler.RegisterUser)
+	api.POST("/sessions", userHandler.LoginUser)
 
 	router.Run()
 }
