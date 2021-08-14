@@ -2,9 +2,11 @@ package main
 
 import (
 	"bwastartup/auth"
+	"bwastartup/campaign"
 	"bwastartup/handler"
 	"bwastartup/helper"
 	"bwastartup/user"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -24,7 +26,20 @@ func main() {
 	}
 
 	userRepository := user.NewRepository(db)
-	// yang dibalikin adalah User
+	campaignRepository := campaign.NewRepository(db)
+
+	campaigns, _ := campaignRepository.FindByUserID(1)
+
+	fmt.Println("DEBUG")
+	for _, c := range campaigns {
+		fmt.Println(c.Name)
+		fmt.Println("------------------")
+		if len(c.CampaignImages) > 0 {
+			fmt.Println(c.CampaignImages[0].FileName)
+		}
+	}
+	fmt.Println("DEBUG")
+
 	userService := user.NewService(userRepository)
 	authService := auth.NewService()
 
